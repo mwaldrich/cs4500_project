@@ -19,15 +19,27 @@ int main(int argc, char** argv) {
   buffer = new char[len];
   if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
 
+  // move to from start to "from"
   fseek ( pFile , from , SEEK_SET );
   // copy the number of bytes in len into the buffer:
   result = fread (buffer,1,len,pFile);
 
-  sys->pln(buffer);
-  sys->pln(result);
+  bool skip_first = from == 0;
+  bool skip_last = len < ftell(pFile);
+  rewind(pFile); // reset after getting size
+
+  char delimiter[2] = "\n";
+  char* token;
+  int i = 0;
+  token = strtok(buffer, delimiter);
+  while (token != NULL) {
+    sys->pln(token);
+    token = strtok(NULL, delimiter);
+  }   
+
   // terminate
   fclose (pFile);
-  free (buffer);
+  delete buffer;
   return 0;
 
 }
