@@ -21,7 +21,7 @@ class StrList : public Object {
   size_t size_ = 0;
 
   /* Whatis the size of the underlying array */
-  size_t length_ = 10;
+  size_t length_ = 0;
 
   StrList() : Object() {
       /* Creates an empty list of 10 nulls */
