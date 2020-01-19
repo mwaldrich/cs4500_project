@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
   StrList* token_list = new StrList();
   char* token = strtok(buffer, delimiter);
   token_list->push_back(new String(token));
-  delete token;
   
   while (token != NULL) {
     token_list->push_back(new String(token));
@@ -45,8 +44,11 @@ int main(int argc, char** argv) {
     //delete token;
   }
 
-  for(size_t i = 0; i < token_list->size(); i++) {
-    sys->pln(token_list->get(i)->str_);
+  for (size_t i = 0; i < token_list->length(); i++) {
+    String* to_print = token_list->get(i);
+    if (to_print != nullptr) {
+      sys->pln(to_print->str_);
+    }
   }
 
   // terminate
