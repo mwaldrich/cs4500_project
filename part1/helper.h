@@ -1,6 +1,7 @@
 #pragma once                                                                     
 //lang::Cpp                                                                                                                                                       
-#include <cstdlib>                                                               
+#include <cstdlib>
+#include <cstring>
 #include <iostream>                                                                                                                                               
 /** Helper class providing some C++ functionality and convenience                
  *  functions. This class has no data, constructors, destructors or              

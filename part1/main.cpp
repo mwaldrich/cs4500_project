@@ -1,7 +1,9 @@
+#pragma once
 #include "helper.h"
 #include "object.h"
 #include "str.h"
 #include "list.h"
+#include <cstring>
 #include <unistd.h>
 
 int main(int argc, char** argv) {
@@ -32,17 +34,15 @@ int main(int argc, char** argv) {
   rewind(pFile); // reset after getting size
 
   char delimiter[2] = "\n";
-  char* token;
-  
   StrList* token_list = new StrList();
-  token = strtok(buffer, delimiter);
+  char* token = strtok(buffer, delimiter);
   token_list->push_back(new String(token));
   delete token;
   
   while (token != NULL) {
-    token = strtok(NULL, delimiter);
     token_list->push_back(new String(token));
-    delete token;
+    token = strtok(NULL, delimiter);
+    //delete token;
   }
 
   for(size_t i = 0; i < token_list->size(); i++) {
