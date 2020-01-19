@@ -3,20 +3,30 @@
 
 int main(int argc, char** argv) {
   Sys* sys = new Sys();
-  char *fvalue = const_cast<char *>("");
+  char *fvalue = const_cast<char *>("data.sor");
+  int from = 0;
+  int len = 10;
   int cli_opt;
 
-  while ((cli_opt = getopt(argc, argv, "f:")) != -1) {
-    switch (cli_opt)
-    {
-    case 'f':
-      fvalue = optarg;
-      break;
-    default:
-      abort();
-    }
-  }
+  FILE * pFile;
+  char * buffer;
+  size_t result;
 
-  sys->pln(fvalue);
-  
+  pFile = fopen ( fvalue , "r" );
+  if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+  // allocate memory to contain the whole file:
+  buffer = new char[len];
+  if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+  // copy the number of bytes in len into the buffer:
+  result = fread (buffer,1,len,pFile);
+
+  sys->pln(buffer);
+  sys->pln(result);
+  // terminate
+  fclose (pFile);
+  free (buffer);
+  return 0;
+
 }
