@@ -4,7 +4,7 @@
 int main(int argc, char** argv) {
   Sys* sys = new Sys();
   char *fvalue = const_cast<char *>("data.sor");
-  int from = 0;
+  int from = 1;
   int len = 10;
   int cli_opt;
 
@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
   buffer = new char[len];
   if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
 
+  fseek ( pFile , from , SEEK_SET );
   // copy the number of bytes in len into the buffer:
   result = fread (buffer,1,len,pFile);
 
