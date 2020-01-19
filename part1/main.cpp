@@ -1,4 +1,3 @@
-#pragma once
 #include "helper.h"
 #include "object.h"
 #include "str.h"
@@ -9,8 +8,8 @@
 int main(int argc, char** argv) {
   Sys* sys = new Sys();
   char *fvalue = const_cast<char *>("data.sor");
-  int from = 1;
-  int len = 10;
+  int from = 0;
+  int len = 100;
   int cli_opt;
 
   FILE * pFile;
@@ -36,19 +35,15 @@ int main(int argc, char** argv) {
   char delimiter[2] = "\n";
   StrList* token_list = new StrList();
   char* token = strtok(buffer, delimiter);
-  token_list->push_back(new String(token));
   
   while (token != NULL) {
     token_list->push_back(new String(token));
     token = strtok(NULL, delimiter);
-    //delete token;
   }
 
-  for (size_t i = 0; i < token_list->length(); i++) {
+  for (size_t i = 0; i < token_list->size(); i++) {
     String* to_print = token_list->get(i);
-    if (to_print != nullptr) {
-      sys->pln(to_print->str_);
-    }
+    sys->pln(to_print->str_);
   }
 
   // terminate
