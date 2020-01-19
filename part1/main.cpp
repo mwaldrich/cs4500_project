@@ -46,6 +46,14 @@ int main(int argc, char** argv) {
     sys->pln(to_print->str_);
   }
 
+  // TODO: Make f, from, and len cli arguments
+
+  // TODO: Get rid of first and/or last rows
+
+  // TODO: Row as a string -> List of fields as strings
+
+  // TODO: Given a field -> Return the type of the field as an enum
+
   // terminate
   fclose (pFile);
   delete buffer;
