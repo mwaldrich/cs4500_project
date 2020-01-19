@@ -1,4 +1,7 @@
 #include "helper.h"
+#include "object.h"
+#include "str.h"
+#include "list.h"
 #include <unistd.h>
 
 int main(int argc, char** argv) {
@@ -30,16 +33,26 @@ int main(int argc, char** argv) {
 
   char delimiter[2] = "\n";
   char* token;
-  int i = 0;
+  
+  StrList* token_list = new StrList();
   token = strtok(buffer, delimiter);
+  token_list->push_back(new String(token));
+  delete token;
+  
   while (token != NULL) {
-    sys->pln(token);
     token = strtok(NULL, delimiter);
-  }   
+    token_list->push_back(new String(token));
+    delete token;
+  }
+
+  for(size_t i = 0; i < token_list->size(); i++) {
+    sys->pln(token_list->get(i)->str_);
+  }
 
   // terminate
   fclose (pFile);
   delete buffer;
+  delete token_list;
   return 0;
 
 }

@@ -141,6 +141,6 @@ class String : public Object {
   };
 
   virtual void print() {
-      print_out(this->str_);
+      pln("String(\"").p(str_).p("\")");
   }
 };
