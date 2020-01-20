@@ -391,3 +391,17 @@ class SortedStrList : public StrList {
       assert(false);
   };
 };
+
+
+class Column : public StrList {
+    public:
+    enum data_type {Float, Int, Bool, Str} data_type_;
+    
+    Column(data_type data_type) : StrList() {
+        data_type_ = data_type;
+    };
+
+    data_type colum_type() {
+        return data_type_;
+    }
+};
