@@ -111,7 +111,7 @@ class StrList : public Object {
       // Appends e to end
       this->up_size();
       this->expand_length(this->length() + 1);
-      this->set_at_idx_(this->length() - 1, e);
+      this->set_at_idx_(this->size() - 1, e);
   };
 
   virtual void add(size_t i, String *e) {
@@ -393,4 +393,18 @@ class SortedStrList : public StrList {
   virtual String *set(int i, String *e) {
       assert(false);
   };
+};
+
+
+class Column : public StrList {
+    public:
+    enum data_type {BOOL, INT, FLOAT, STRING} data_type_;
+    
+    Column(data_type data_type) : StrList() {
+        data_type_ = data_type;
+    };
+
+    data_type colum_type() {
+        return data_type_;
+    }
 };
