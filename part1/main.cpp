@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 
   for (size_t i = 0; i < token_list->size(); i++) {
     String* to_print = token_list->get(i);
-    // to_print->print();
+    to_print->print();
   }
 
   // TODO: Make f, from, and len cli arguments
