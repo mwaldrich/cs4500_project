@@ -395,7 +395,7 @@ class SortedStrList : public StrList {
 
 class Column : public StrList {
     public:
-    enum data_type {Float, Int, Bool, Str} data_type_;
+    enum data_type {BOOL, INT, FLOAT, STRING} data_type_;
     
     Column(data_type data_type) : StrList() {
         data_type_ = data_type;
