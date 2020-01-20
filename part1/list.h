@@ -41,7 +41,10 @@ class StrList : public Object {
   };
 
   StrList(String *start) : Object() {
-      StrList(start, 0);
+    length_ = 1;
+    list_ = this->create_null_array_(length_);
+    list_[0] = start;
+    up_size();
   };
 
   ~StrList() {

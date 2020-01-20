@@ -7,16 +7,19 @@
 #include <unistd.h>
 
 int main(int argc, char** argv) {
+
+  // parser
   Sys* sys = new Sys();
   char *fvalue = const_cast<char *>("data.sor");
-  int from = 1;
-  int len = 10;
+  int from = 0;
+  int len = 100;
   int cli_opt;
 
   FILE * pFile;
   char * buffer;
   size_t result;
 
+  // read in file and tokenize
   pFile = fopen ( fvalue , "r" );
   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
 
@@ -36,13 +39,18 @@ int main(int argc, char** argv) {
   char delimiter[2] = "\n";
   StrList* token_list = new StrList();
   char* token = strtok(buffer, delimiter);
-  token_list->push_back(new String(token));
   
   while (token != NULL) {
     token_list->push_back(new String(token));
     token = strtok(NULL, delimiter);
     //delete token;
   }
+
+  if (skip_first) {
+    token_list->remove(0);
+  }
+
+  // parse tokens
 
   for (size_t i = 0; i < token_list->length(); i++) {
     String* to_print = token_list->get(i);
