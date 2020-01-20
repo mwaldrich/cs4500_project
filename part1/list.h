@@ -21,7 +21,7 @@ class StrList : public Object {
   size_t size_ = 0;
 
   /* Whatis the size of the underlying array */
-  size_t length_ = 0;
+  size_t length_ = 10;
 
   StrList() : Object() {
       /* Creates an empty list of 10 nulls */
@@ -108,7 +108,7 @@ class StrList : public Object {
       // Appends e to end
       this->up_size();
       this->expand_length(this->length() + 1);
-      this->set_at_idx_(this->length() - 1, e);
+      this->set_at_idx_(this->size() - 1, e);
   };
 
   virtual void add(size_t i, String *e) {
