@@ -55,13 +55,24 @@ class String : public Object {
   };
 
   String *get_slice(size_t start, size_t end) {
-      assert(start < this->size() && end <= this->size() && start < end);
+    /* Creates a new String of all the chars between start to end - 1. Start and end must be within the size of this
+     * String. If start equals end a empty String is returned.
+     * @param start: index to start slice
+     * @param end: index to end slice minus one
+     * @return: chars of this string between start to end - 1 */
+      assert(start <= this->size() && end <= this->size());
+      if (start == end) return new String();
       char *slice = create_char_str_array_(end - start);
       for (size_t i = start; i < end; i = i + 1) slice[i] = this->get(i);
       String* to_return = new String(slice);
       delete[] slice;
       return to_return;
   };
+
+  char get(size_t idx) {
+    assert(0 <= idx < this->size_);
+    return this->str_[idx];
+  }
 
   String *reverse() {
       if (this->size() == 0) return new String();
