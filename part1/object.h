@@ -17,7 +17,7 @@ class Object : public Sys {
   /** Returns the object's hash value. Two objects that are equal should         
    * have the same hash; object's that are not, may have the same hash.          
    * Subclasses should implement hash_me_(). */                                  
-  size_t hash() {  return  hash_ ? hash_ :  hash_ = hash_me_();  }               
+  virtual size_t hash() {  return  hash_ ? hash_ :  hash_ = hash_me_();  }
                                                                                  
   /** Trivial hash function. */                                                  
   virtual size_t hash_me_() { return 0; }                                        
