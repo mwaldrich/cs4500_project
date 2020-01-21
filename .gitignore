@@ -2,4 +2,7 @@ settings.json
 a.out
 .idea/
 CMakeLists.txt
-cmake-build-debug
+main
+part1/main
+CMakeLists.txt
+cmake-build-debug/

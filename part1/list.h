@@ -40,12 +40,12 @@ class StrList : public Object {
       up_size();
   };
 
-  StrList(String *start) : Object() {
-    length_ = 1;
-    list_ = this->create_null_array_(length_);
-    list_[0] = start;
-    up_size();
-  };
+//  StrList(String *start) : Object() {
+//    length_ = 1;
+//    list_ = this->create_null_array_(length_);
+//    list_[0] = start;
+//    up_size();
+//  };
 
   ~StrList() {
       /* Deletes this list by deleting the underlying array */
@@ -122,7 +122,7 @@ class StrList : public Object {
        * @param i: index to insert the given String
        * @param e: String to insert
        * @return: None */
-      String **new_list = new String *[this->length() + 1];
+      String **new_list = this->create_null_array_(this->length_ + 1);
       for (size_t idx = 0; idx < this->length(); idx = idx + 1) {
           if (idx >= i) {
               new_list[idx + 1] = this->get(idx);
