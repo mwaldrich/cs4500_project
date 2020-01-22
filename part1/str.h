@@ -63,7 +63,7 @@ class String : public Object {
       assert(start <= this->size() && end <= this->size());
       if (start == end) return new String();
       char *slice = create_char_str_array_(end - start);
-      for (size_t i = start; i < end; i = i + 1) slice[i] = this->get(i);
+      for (size_t i = start; i < end; i++) slice[i - start] = this->get(i);
       String* to_return = new String(slice);
       delete[] slice;
       return to_return;

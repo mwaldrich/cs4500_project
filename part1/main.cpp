@@ -163,19 +163,20 @@ String *get_largest_row(FILE *stream) {
 }
 
 StrList *row_to_fields(String *row_string) {
+  puts(row_string->str_);
   StrList *fields = new StrList();
   size_t field_idx = 0;
-  // indices tracking start & end of a field, negative means currently unassigned
-  int start_bracket_idx = -1;
+  int start_bracket_idx = -1;  // indices tracking start of a field, negative means currently unassigned
   bool in_quotes = false;
-  Sys * sys = new Sys();
-  for (size_t idx = 1; idx < row_string->size(); idx += 1) {
+  for (size_t idx = 0; idx < row_string->size(); idx++) {
     char cur_char = row_string->get(idx);
     if (cur_char == START_BRACKET) {
       if (start_bracket_idx < 0) start_bracket_idx = idx;
-    } else if (cur_char == END_BRACKET || (in_quotes && cur_char == '"')) {
+    } else if ((start_bracket_idx > -1 && cur_char == END_BRACKET ) || (in_quotes && cur_char == '"')) {
       if (start_bracket_idx >= 0) {
-        fields->set(field_idx, row_string->get_slice(start_bracket_idx, idx));
+        String* slice = row_string->get_slice(start_bracket_idx+1, idx);
+        puts(slice->str_);
+        fields->set(field_idx, slice);
         field_idx += 1;
         start_bracket_idx = -1;
         in_quotes = false;
@@ -195,7 +196,6 @@ StrList *buffer_to_string_rows(char *buffer, bool skip_first_and_last) {
   StrList *token_list = new StrList(20);
   char *token = strtok(buffer, delimiter);
   size_t i = 0;
-  Sys* sys = new Sys();
   while (token != nullptr) {
     if (!skip_first_and_last) {
       token_list->set(i, new String(token));
@@ -228,11 +228,9 @@ int main(int argc, char **argv) {
 
   // Find row with the most fields
   String *largest_row = get_largest_row(sor_file);
-  sys->p("Row with most fields: ").p(largest_row->str_);
 
   // move file pointer start from start of file to from
   fseek(sor_file, arg_vars->from, SEEK_SET);
-  sys->p(arg_vars->from).pln();
   // TODO check offset is offset correct?
 
   size_t buffer_len = arg_vars->len;
@@ -247,7 +245,6 @@ int main(int argc, char **argv) {
 
   // split file buffer into rows based on newline
   bool skip_first_and_last = arg_vars->from != 0 || arg_vars->len < file_size;
-  puts(sor_buffer);
   StrList *row_str_list = buffer_to_string_rows(sor_buffer, skip_first_and_last);
 
   // string rows -> list of fields as strings
@@ -256,8 +253,11 @@ int main(int argc, char **argv) {
     field_rows[idx] = row_to_fields(row_str_list->get(idx));
   }
 
-  // largest row into array of fields for
-  
+  // largest row into array of types for schema
+  StrList *largest_row_fields = row_to_fields(largest_row);
+  for (size_t idx = 0; idx < largest_row_fields->size(); idx++) {
+    puts(largest_row_fields->get(idx)->str_);
+  }
 
   // TODO Given a field, return the type of the field as an enum
 
