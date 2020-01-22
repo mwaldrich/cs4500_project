@@ -101,7 +101,6 @@ ArgVars *parse_arrays(int argc, char **argv) {
         arg_vars->col_idx[0] = char_array_to_uint(argv[optind]);
         optind++;
         arg_vars->col_idx[1] = char_array_to_uint(argv[optind]);
-        printf("%ld%ld\n", arg_vars->col_idx[0], arg_vars->col_idx[1]);
         break;
       case 'm':
         optind--;
@@ -179,7 +178,7 @@ String *get_largest_row(FILE *stream) {
   if (result != 0) perror("error setting position");
 
   char *largest_row = new char[largest_row_len + 1];
-  fread(largest_row, sizeof(char), largest_row_len, stream);
+  size_t read_result = fread(largest_row, sizeof(char), largest_row_len, stream);
   largest_row[largest_row_len] = '\0';
   String *largest_row_str = new String(largest_row);
 
@@ -190,7 +189,6 @@ String *get_largest_row(FILE *stream) {
 }
 
 StrList *row_to_fields(String *row_string) {
-  puts(row_string->str_);
   StrList *fields = new StrList();
   size_t field_idx = 0;
   int start_bracket_idx = -1;  // indices tracking start of a field, negative means currently unassigned
@@ -236,7 +234,7 @@ StrList *buffer_to_string_rows(char *buffer, bool skip_first_and_last) {
     }
     token = strtok(nullptr, delimiter);
   }
-  delete token;
+  delete[] token;
   if (skip_first_and_last) token_list->remove(i);
   return token_list;
 }
@@ -299,7 +297,9 @@ int main(int argc, char **argv) {
   delete[] field_rows;
   delete arg_vars;
   delete largest_row;
+  delete largest_row_fields;
   delete[] sor_buffer;
   delete row_str_list;
+  delete sys;
   return 0;
 }

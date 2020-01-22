@@ -70,7 +70,7 @@ class String : public Object {
   };
 
   char get(size_t idx) {
-    assert(0 <= idx < this->size_);
+    assert(0 <= idx && idx < this->size_);
     return this->str_[idx];
   }
 
