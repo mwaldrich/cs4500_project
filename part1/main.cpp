@@ -3,7 +3,6 @@
 #include "list.h"
 #include <cstring>
 #include <getopt.h>
-#include <regex.h>
 #include "buffer_reader.h"
 #include "row_to_fields.h"
 
@@ -13,45 +12,6 @@
 #define START_BRACKET '<'
 #define END_BRACKET '>'
 
-Column::data_type get_type(char *field) {
-  regex_t string_regex;
-  regex_t float_regex;
-  regex_t bool_regex;
-  regex_t int_regex;
-
-  int string_regex_compiled = regcomp(&string_regex, "[a-zA-Z]+", REG_EXTENDED);
-  int float_regex_compiled = regcomp(&float_regex, "[-+]?[0-9]*\\.+[0-9]+", REG_EXTENDED);
-  int bool_regex_compiled = regcomp(&bool_regex, "^[0|1]$", REG_EXTENDED);
-  int int_regex_compiled = regcomp(&int_regex, "[-+]?[0-9]+", REG_EXTENDED);
-
-  assert(string_regex_compiled == 0);
-  assert(float_regex_compiled == 0);
-  assert(bool_regex_compiled == 0);
-  assert(int_regex_compiled == 0);
-
-  Column::data_type field_type;
-  if (regexec(&string_regex, field, 0, nullptr, 0) == 0) {
-    field_type = Column::STRING;
-  }
-  else if (regexec(&float_regex, field, 0, nullptr, 0) == 0) {
-    field_type = Column::FLOAT;
-  }
-  else if (regexec(&bool_regex, field, 0, nullptr, 0) == 0) {
-    field_type = Column::BOOL;
-  }
-  else {
-    field_type = Column::INT;
-  }
-
-  // free regexes
-  regfree(&float_regex);
-  regfree(&string_regex);
-  regfree(&int_regex);
-  regfree(&bool_regex);
-
-  return field_type;
-};
-
 static struct option arg_options[] = {{"f", required_argument, 0, 'f'},
                                       {"from", required_argument, 0, 'r'},
                                       {"len", required_argument, 0, 'l'},
@@ -60,7 +20,7 @@ static struct option arg_options[] = {{"f", required_argument, 0, 'f'},
                                       {"is_missing_idx", required_argument, 0, 'm'},
                                       {0, 0, 0, 0}}; // must end in zeros
 
-class ArgVars: public Object {
+class ArgVars : public Object {
  public:
   char *file_name;
   size_t from = DEFAULT_FROM;
@@ -69,16 +29,16 @@ class ArgVars: public Object {
   size_t col_idx[2];
   size_t missing_idx[2];
 
-  virtual bool equals(Object* other) {
+  virtual bool equals(Object *other) {
     ArgVars *casted_other = dynamic_cast<ArgVars *>(other);
     if (other == nullptr) return false;
     return this->from == casted_other->from &&
-    this->len == casted_other->len &&
-    this->col_type == casted_other->col_type &&
-    this->col_idx[0] == casted_other->col_idx[0] &&
-    this->col_idx[1] == casted_other->col_idx[1] &&
-    this->missing_idx[0] == casted_other->missing_idx[0] &&
-    this->missing_idx[1] == casted_other->missing_idx[1];
+        this->len == casted_other->len &&
+        this->col_type == casted_other->col_type &&
+        this->col_idx[0] == casted_other->col_idx[0] &&
+        this->col_idx[1] == casted_other->col_idx[1] &&
+        this->missing_idx[0] == casted_other->missing_idx[0] &&
+        this->missing_idx[1] == casted_other->missing_idx[1];
   }
 };
 

@@ -82,3 +82,8 @@ void test_split_skip() {
 
   puts("buffer reader tests skip passed");
 }
+
+void buffer_parse_tests() {
+  test_split_skip();
+  test_split_no_skip();
+}

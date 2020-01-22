@@ -163,3 +163,8 @@ void single_fields() {
 void multiple_fields() {
   puts("multiple field tests passed");
 }
+
+void row_to_field_tests() {
+  single_fields();
+  multiple_fields();
+}
