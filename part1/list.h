@@ -406,5 +406,5 @@ class Column : public StrList {
 
     data_type colum_type() {
         return data_type_;
-    }
+    };
 };
