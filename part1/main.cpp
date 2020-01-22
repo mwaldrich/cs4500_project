@@ -3,8 +3,9 @@
 #include "list.h"
 #include <cstring>
 #include <getopt.h>
-#include <unistd.h>
 #include <regex.h>
+#include "buffer_reader.h"
+#include "row_to_fields.h"
 
 #define DEFAULT_FROM 0
 #define DEFAULT_LEN 100
@@ -59,7 +60,7 @@ static struct option arg_options[] = {{"f", required_argument, 0, 'f'},
                                       {"is_missing_idx", required_argument, 0, 'm'},
                                       {0, 0, 0, 0}}; // must end in zeros
 
-class ArgVars {
+class ArgVars: public Object {
  public:
   char *file_name;
   size_t from = DEFAULT_FROM;
@@ -67,6 +68,18 @@ class ArgVars {
   size_t col_type = -1;
   size_t col_idx[2];
   size_t missing_idx[2];
+
+  virtual bool equals(Object* other) {
+    ArgVars *casted_other = dynamic_cast<ArgVars *>(other);
+    if (other == nullptr) return false;
+    return this->from == casted_other->from &&
+    this->len == casted_other->len &&
+    this->col_type == casted_other->col_type &&
+    this->col_idx[0] == casted_other->col_idx[0] &&
+    this->col_idx[1] == casted_other->col_idx[1] &&
+    this->missing_idx[0] == casted_other->missing_idx[0] &&
+    this->missing_idx[1] == casted_other->missing_idx[1];
+  }
 };
 
 size_t char_array_to_uint(char *arg) {
@@ -186,57 +199,6 @@ String *get_largest_row(FILE *stream) {
   rewind(stream);
 
   return largest_row_str;
-}
-
-StrList *row_to_fields(String *row_string) {
-  StrList *fields = new StrList();
-  size_t field_idx = 0;
-  int start_bracket_idx = -1;  // indices tracking start of a field, negative means currently unassigned
-  bool in_quotes = false;
-  for (size_t idx = 0; idx < row_string->size(); idx++) {
-    char cur_char = row_string->get(idx);
-    if (cur_char == START_BRACKET) {
-      if (start_bracket_idx < 0) start_bracket_idx = idx;
-    }
-    else if ((start_bracket_idx > -1 && cur_char == END_BRACKET) || (in_quotes && cur_char == '"')) {
-      if (start_bracket_idx >= 0) {
-        String *slice = row_string->get_slice(start_bracket_idx + 1, idx);
-        puts(slice->str_);
-        fields->set(field_idx, slice);
-        field_idx += 1;
-        start_bracket_idx = -1;
-        in_quotes = false;
-      }
-    }
-    else if (cur_char == ' ' && start_bracket_idx >= 0 && !in_quotes) {
-      // TODO handle case of space in field between non-space characters not in quotes
-      start_bracket_idx += 1;
-    }
-    else if (cur_char == '"') {
-      in_quotes = true;
-    }
-  }
-  return fields;
-}
-
-StrList *buffer_to_string_rows(char *buffer, bool skip_first_and_last) {
-  char delimiter[2] = "\n";
-  StrList *token_list = new StrList(20);
-  char *token = strtok(buffer, delimiter);
-  size_t i = 0;
-  while (token != nullptr) {
-    if (!skip_first_and_last) {
-      token_list->set(i, new String(token));
-      i += 1;
-    }
-    else {
-      skip_first_and_last = false;
-    }
-    token = strtok(nullptr, delimiter);
-  }
-  delete[] token;
-  if (skip_first_and_last) token_list->remove(i);
-  return token_list;
 }
 
 int main(int argc, char **argv) {
