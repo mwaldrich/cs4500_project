@@ -31,11 +31,14 @@ Column::data_type get_type(char *field) {
   Column::data_type field_type;
   if (regexec(&string_regex, field, 0, nullptr, 0) == 0) {
     field_type = Column::STRING;
-  } else if (regexec(&float_regex, field, 0, nullptr, 0) == 0) {
+  }
+  else if (regexec(&float_regex, field, 0, nullptr, 0) == 0) {
     field_type = Column::FLOAT;
-  } else if (regexec(&bool_regex, field, 0, nullptr, 0) == 0) {
+  }
+  else if (regexec(&bool_regex, field, 0, nullptr, 0) == 0) {
     field_type = Column::BOOL;
-  } else {
+  }
+  else {
     field_type = Column::INT;
   }
 
@@ -52,6 +55,8 @@ static struct option arg_options[] = {{"f", required_argument, 0, 'f'},
                                       {"from", required_argument, 0, 'r'},
                                       {"len", required_argument, 0, 'l'},
                                       {"print_col_type", required_argument, 0, 't'},
+                                      {"print_col_idx", required_argument, 0, 'i'},
+                                      {"is_missing_idx", required_argument, 0, 'm'},
                                       {0, 0, 0, 0}}; // must end in zeros
 
 class ArgVars {
@@ -75,18 +80,37 @@ ArgVars *parse_arrays(int argc, char **argv) {
   ArgVars *arg_vars = new ArgVars();
   bool file_given = false;
   int opt;
-  while ((opt = getopt_long_only(argc, argv, "f:r:l:t:", arg_options, NULL)) != -1) {
+  while ((opt = getopt_long_only(argc, argv, "f:r:l:t:i:m:", arg_options, NULL)) != -1) {
     switch (opt) {
-      case 'f':file_given = true;
+      case 'f':
+        file_given = true;
         arg_vars->file_name = optarg;
         break;
-      case 'r':arg_vars->from = char_array_to_uint(optarg);
+      case 'r':
+        arg_vars->from = char_array_to_uint(optarg);
         break;
-      case 'l':arg_vars->len = char_array_to_uint(optarg);
+      case 'l':
+        arg_vars->len = char_array_to_uint(optarg);
         break;
-      case 't':arg_vars->col_type = char_array_to_uint(optarg);
+      case 't':
+        arg_vars->col_type = char_array_to_uint(optarg);
         break;
-      default:printf("invalid flag: %c", optopt);
+      case 'i':
+        // TODO error checking on next item? explain
+        optind--;
+        arg_vars->col_idx[0] = char_array_to_uint(argv[optind]);
+        optind++;
+        arg_vars->col_idx[1] = char_array_to_uint(argv[optind]);
+        printf("%ld%ld\n", arg_vars->col_idx[0], arg_vars->col_idx[1]);
+        break;
+      case 'm':
+        optind--;
+        arg_vars->missing_idx[0] = char_array_to_uint(argv[optind]);
+        optind++;
+        arg_vars->missing_idx[1] = char_array_to_uint(argv[optind]);
+        break;
+      default:
+        printf("invalid flag: %c", optopt);
         exit(1);
     }
   }
@@ -123,18 +147,21 @@ String *get_largest_row(FILE *stream) {
     cur_row_len += 1;
     if (cur_char == EOF) {
       end_file = true;
-    } else if (cur_char == START_BRACKET) {
+    }
+    else if (cur_char == START_BRACKET) {
       // ignore multiple start brackets like <<>
       if (!start_bracket_found) {
         start_bracket_found = true;
         set_position(stream, cur_row_start);
       }
-    } else if (cur_char == END_BRACKET) {
+    }
+    else if (cur_char == END_BRACKET) {
       if (start_bracket_found) {
         cur_row_size += 1;
         start_bracket_found = false;
       }
-    } else if (cur_char == '\n') {
+    }
+    else if (cur_char == '\n') {
       if (cur_row_size > largest_row_size) {
         largest_row_size = cur_row_size;
         largest_row_start = cur_row_start;
@@ -172,19 +199,22 @@ StrList *row_to_fields(String *row_string) {
     char cur_char = row_string->get(idx);
     if (cur_char == START_BRACKET) {
       if (start_bracket_idx < 0) start_bracket_idx = idx;
-    } else if ((start_bracket_idx > -1 && cur_char == END_BRACKET ) || (in_quotes && cur_char == '"')) {
+    }
+    else if ((start_bracket_idx > -1 && cur_char == END_BRACKET) || (in_quotes && cur_char == '"')) {
       if (start_bracket_idx >= 0) {
-        String* slice = row_string->get_slice(start_bracket_idx+1, idx);
+        String *slice = row_string->get_slice(start_bracket_idx + 1, idx);
         puts(slice->str_);
         fields->set(field_idx, slice);
         field_idx += 1;
         start_bracket_idx = -1;
         in_quotes = false;
       }
-    } else if (cur_char == ' ' && start_bracket_idx >= 0 && !in_quotes) {
+    }
+    else if (cur_char == ' ' && start_bracket_idx >= 0 && !in_quotes) {
       // TODO handle case of space in field between non-space characters not in quotes
       start_bracket_idx += 1;
-    } else if (cur_char == '"') {
+    }
+    else if (cur_char == '"') {
       in_quotes = true;
     }
   }
@@ -200,7 +230,8 @@ StrList *buffer_to_string_rows(char *buffer, bool skip_first_and_last) {
     if (!skip_first_and_last) {
       token_list->set(i, new String(token));
       i += 1;
-    } else {
+    }
+    else {
       skip_first_and_last = false;
     }
     token = strtok(nullptr, delimiter);
@@ -226,8 +257,9 @@ int main(int argc, char **argv) {
   size_t file_size = ftell(sor_file);
   rewind(sor_file);
 
-  // Find row with the most fields
+  // Find row with the most fields, turn into schema for columns
   String *largest_row = get_largest_row(sor_file);
+  StrList *largest_row_fields = row_to_fields(largest_row);
 
   // move file pointer start from start of file to from
   fseek(sor_file, arg_vars->from, SEEK_SET);
@@ -251,12 +283,6 @@ int main(int argc, char **argv) {
   StrList **field_rows = new StrList *[row_str_list->size()];
   for (size_t idx = 0; idx < row_str_list->size(); idx += 1) {
     field_rows[idx] = row_to_fields(row_str_list->get(idx));
-  }
-
-  // largest row into array of types for schema
-  StrList *largest_row_fields = row_to_fields(largest_row);
-  for (size_t idx = 0; idx < largest_row_fields->size(); idx++) {
-    puts(largest_row_fields->get(idx)->str_);
   }
 
   // TODO Given a field, return the type of the field as an enum
