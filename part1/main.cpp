@@ -199,6 +199,10 @@ int main(int argc, char **argv) {
   bool skip_first_and_last = arg_vars->from != 0 || arg_vars->len < file_size;
   StrList *row_str_list = buffer_to_string_rows(sor_buffer, skip_first_and_last);
 
+  for (size_t idx = 0; idx < row_str_list->size(); idx ++) {
+    sys->pln(row_str_list->get(idx)->str_);
+  }
+
   // string rows -> list of fields as strings
   StrList **field_rows = new StrList *[row_str_list->size()];
   for (size_t idx = 0; idx < row_str_list->size(); idx += 1) {
