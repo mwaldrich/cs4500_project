@@ -6,3 +6,5 @@ main
 part1/main
 part1/CMakeLists.txt
 cmake-build-debug/
+test_main
+test

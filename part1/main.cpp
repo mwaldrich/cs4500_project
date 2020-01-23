@@ -6,14 +6,6 @@
 #include "buffer_reader.h"
 #include "row_to_fields.h"
 
-Column **infer_schema(StrList *row_fields) {
-  Column **columns = new Column *[row_fields->size()];
-  for (int i = 0; i < row_fields->size(); i++) {
-    columns[i] = new Column(get_type(row_fields->get(i)));
-  }
-  return columns;
-}
-
 #define DEFAULT_FROM 0
 #define DEFAULT_LEN 100
 #define READ_SCHEMA_LINE_COUNT 500
@@ -231,6 +223,17 @@ String *get_largest_row(FILE *sor_stream) {
   delete[] largest_row;
   rewind(sor_stream);
   return largest_row_str;
+}
+
+Column **infer_schema(StrList *row_fields) {
+  /* Given a StrList representing a list of SOR field values, infers the DataType of each field to construct a empty
+   * array of Columns, where the ith field gives the DataType for the ith column. N Columns are constructed where N
+   * is the number of fields given.
+   * @param row_fields: row of a SOR file, as a StrList where each String is SOR field value
+   * @return: array of N Columns where each column was assigned a type from associated SOR field value */
+  Column **columns = new Column *[row_fields->size()];
+  for (int i = 0; i < row_fields->size(); i++) columns[i] = new Column(get_type(row_fields->get(i)));
+  return columns;
 }
 
 int main(int argc, char **argv) {

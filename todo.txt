@@ -1,3 +1,0 @@
--count min of 500 rows when counting row lines
--how to interpret brackets when row counting
--row 
