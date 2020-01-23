@@ -6,9 +6,9 @@
 #include "buffer_reader.h"
 #include "row_to_fields.h"
 
-Column** infer_schema(StrList* row_fields) {
-  Column** columns = new Column*[row_fields->size()];
-  for(int i = 0; i < row_fields->size(); i++) {
+Column **infer_schema(StrList *row_fields) {
+  Column **columns = new Column *[row_fields->size()];
+  for (int i = 0; i < row_fields->size(); i++) {
     columns[i] = new Column(get_type(row_fields->get(i)));
   }
   return columns;
@@ -31,13 +31,16 @@ static struct option arg_options[] = {{"f", required_argument, 0, 'f'},
 class ArgVars : public Object {
  public:
   char *file_name;
-  size_t from = DEFAULT_FROM;
-  size_t len = DEFAULT_LEN;
-  int col_type = -1;
+  size_t from;
+  size_t len;
+  int col_type;
   int col_idx[2];
   int missing_idx[2];
 
   ArgVars() : Object() {
+    from = DEFAULT_FROM;
+    len = DEFAULT_LEN;
+    col_type = -1;
     col_idx[0] = -1;
     col_idx[1] = -1;
     missing_idx[0] = -1;
@@ -55,6 +58,14 @@ class ArgVars : public Object {
         this->missing_idx[0] == casted_other->missing_idx[0] &&
         this->missing_idx[1] == casted_other->missing_idx[1];
   }
+
+  bool missing_idx_assigned() {
+    return this->missing_idx[0] > -1 || this->missing_idx[1] > -1;
+  }
+
+  bool col_idx_assigned() {
+    return this->col_idx[0] > -1 || this->col_idx[1] > -1;
+  }
 };
 
 size_t char_array_to_uint(char *arg) {
@@ -68,7 +79,7 @@ ArgVars *parse_arrays(int argc, char **argv) {
   ArgVars *arg_vars = new ArgVars();
   bool file_given = false;
   int opt;
-  while ((opt = getopt_long_only(argc, argv, "f:r:l:t:i:m:", arg_options, NULL)) != -1) {
+  while ((opt = getopt_long_only(argc, argv, "f:r:l:t:i:m:", arg_options, nullptr)) != -1) {
     switch (opt) {
       case 'f':
         file_given = true;
@@ -135,18 +146,13 @@ String *get_largest_row(FILE *stream) {
     if (cur_char == EOF) {
       end_file = true;
     }
-    else if (cur_char == START_BRACKET) {
-      // ignore multiple start brackets like <<>
-      if (!start_bracket_found) {
-        start_bracket_found = true;
-        set_position(stream, cur_row_start);
-      }
+    else if (cur_char == START_BRACKET && !start_bracket_found) {
+      start_bracket_found = true;
+      set_position(stream, cur_row_start);
     }
-    else if (cur_char == END_BRACKET) {
-      if (start_bracket_found) {
-        cur_row_size += 1;
-        start_bracket_found = false;
-      }
+    else if (start_bracket_found && cur_char == END_BRACKET) {
+      cur_row_size += 1;
+      start_bracket_found = false;
     }
     else if (cur_char == '\n') {
       if (cur_row_size > largest_row_size) {
@@ -172,7 +178,6 @@ String *get_largest_row(FILE *stream) {
 
   delete[] largest_row;
   rewind(stream);
-
   return largest_row_str;
 }
 
@@ -187,16 +192,16 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  // go to end, get file size, rewind to start
+  // get size of the file
   fseek(sor_file, 0L, SEEK_END);
   size_t file_size = ftell(sor_file);
   rewind(sor_file);
 
-  // Find row with the most fields, turn into schema for columns
+  // find row with the most fields, turn into schema for columns
   String *largest_row = get_largest_row(sor_file);
   StrList *largest_row_fields = row_to_fields(largest_row);
 
-  // move file pointer start from start of file to from
+  // move file pointer from bytes over from start
   fseek(sor_file, arg_vars->from, SEEK_SET);
   // TODO check offset is offset correct?
 
@@ -214,59 +219,45 @@ int main(int argc, char **argv) {
   bool skip_first_and_last = arg_vars->from != 0 || arg_vars->len < file_size;
   StrList *row_str_list = buffer_to_string_rows(sor_buffer, skip_first_and_last);
 
-  for (size_t idx = 0; idx < row_str_list->size(); idx ++) {
-    sys->pln(row_str_list->get(idx)->str_);
-  }
-
   // string rows -> list of fields as strings
   StrList **field_rows = new StrList *[row_str_list->size()];
-  for (size_t idx = 0; idx < row_str_list->size(); idx += 1) {
-    field_rows[idx] = row_to_fields(row_str_list->get(idx));
-  }
+  for (size_t idx = 0; idx < row_str_list->size(); idx += 1) field_rows[idx] = row_to_fields(row_str_list->get(idx));
 
-  Column** columns = infer_schema(largest_row_fields);
+  // transform rows of fields in array of columns
+  Column **columns = infer_schema(largest_row_fields);
   size_t num_rows = row_str_list->size();
   size_t num_columns = largest_row_fields->size();
-
-  StrList* current_row;
-  for(size_t i = 0; i < num_columns; i++) {
-    for(size_t j = 0; j < num_rows; j++) {
-        current_row = field_rows[j];
-        if(current_row->size() <= i) {
-          columns[i]->push_back(new String(""));
-        } else {
-          columns[i]->push_back(field_rows[j]->get(i));
-        }
+  StrList *current_row;
+  for (size_t i = 0; i < num_columns; i++) {
+    for (size_t j = 0; j < num_rows; j++) {
+      current_row = field_rows[j];
+      if (current_row->size() <= i) {
+        columns[i]->push_back(new String(""));
+      }
+      else {
+        columns[i]->push_back(field_rows[j]->get(i));
+      }
     }
   }
 
-  if(arg_vars->col_type >= 0) {
-    print_data_type(columns[arg_vars->col_type]->get_column_type());
+  // print output based on arg vars & created columns array
+  // TODO idx checking
+  if (arg_vars->col_type >= 0) print_data_type(columns[arg_vars->col_type]->get_column_type());
+
+  if (arg_vars->missing_idx_assigned()) {
+    int column_idx = arg_vars->missing_idx[0];
+    int row_idx = arg_vars->missing_idx[1];
+    printf("%d\n", columns[column_idx]->get(row_idx)->is_empty());
   }
 
-   if (arg_vars->missing_idx[0] > -1 && arg_vars->missing_idx[1] > -1) {
-     int column_idx = arg_vars->missing_idx[0];
-     int row_idx = arg_vars->missing_idx[1];
-     printf("%d\n", columns[column_idx]->get(row_idx)->is_empty());
-   }
-
-  if (arg_vars->col_idx[0] > -1 && arg_vars->col_idx[1] > -1) {
+  if (arg_vars->col_idx_assigned()) {
     int column_idx = arg_vars->col_idx[0];
     int row_idx = arg_vars->col_idx[1];
     columns[column_idx]->get(row_idx)->print();
   }
 
-  // TODO Given a field, return the type of the field as an enum
-
-  // TODO largest col count to largest column as string, column count with row to fields
-
-  // TODO rows into columns
-
-  // TODO operations on columns array
-
-  // TODO set up testing bed
-
-  // terminate
+  // clean up
+  delete[] columns;
   delete[] field_rows;
   delete arg_vars;
   delete largest_row;
