@@ -2,6 +2,8 @@
 #include "../str.h"
 #include "../row_to_fields.h"
 
+/* Module testing our SOR row to fields parser */
+
 void single_fields() {
   String* row;
   String* output;
@@ -161,6 +163,139 @@ void single_fields() {
 }
 
 void multiple_fields() {
+  String* row;
+  String* output;
+  String* output1;
+  StrList* fields = new StrList();
+
+  // two empty items
+  row = new String("<><>");
+  output = new String();
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output));
+  delete row;
+  delete output;
+  delete fields;
+
+  // two items
+  row = new String("<foo><bar>");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces between
+  row = new String("<foo>  <bar>");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces before
+  row = new String("  <foo><bar>");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces after
+  row = new String("<foo><bar>  ");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces all over
+  row = new String("   <foo>   <bar>  ");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces within first
+  row = new String("<  foo ><bar>");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces within second
+  row = new String("<foo>< bar >");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces within both
+  row = new String("<foo ><  bar  >");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  // two items with spaces within and all around
+  row = new String("  <  foo >  <  bar  >   ");
+  output = new String("foo");
+  output1 = new String("bar");
+  fields = row_to_fields(row);
+  assert(fields->size() == 2);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
   puts("multiple field tests passed");
 }
 

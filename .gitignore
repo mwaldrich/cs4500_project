@@ -1,8 +1,12 @@
 settings.json
 a.out
 .idea/
-part1/CMakeLists.txt
+CMakeLists.txt
 main
 part1/main
-part1/CMakeLists.txt
 cmake-build-debug/
+test
+sorer
+test_main
+*.dSYM
+
