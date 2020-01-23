@@ -1,5 +1,6 @@
 #pragma once
 #include <regex.h>
+#include <stdio.h>
 
 enum class DataType {BOOL, INT, FLOAT, STRING};
 
@@ -28,10 +29,13 @@ DataType get_type(String *string) {
     field_type = DataType ::FLOAT;
   }
   else if (regexec(&bool_regex, field, 0, nullptr, 0) == 0) {
-    field_type = DataType::BOOL;
+    field_type = DataType ::BOOL;
+  }
+  else if (regexec(&int_regex, field, 0, nullptr, 0) == 0) {
+    field_type = DataType::INT;
   }
   else {
-    field_type = DataType::INT;
+    field_type = DataType::BOOL;
   }
 
   // free regexes
@@ -42,3 +46,13 @@ DataType get_type(String *string) {
 
   return field_type;
 };
+
+void print_data_type(DataType data_type) {
+  switch(data_type)
+  {
+      case DataType::BOOL  : puts("BOOL");   break;
+      case DataType::INT  : puts("INT");   break;
+      case DataType::FLOAT  : puts("FLOAT");   break;
+      case DataType::STRING  : puts("STRING");   break;
+  }
+}

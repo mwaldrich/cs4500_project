@@ -34,8 +34,15 @@ class ArgVars : public Object {
   size_t from = DEFAULT_FROM;
   size_t len = DEFAULT_LEN;
   size_t col_type = -1;
-  size_t col_idx[2];
-  size_t missing_idx[2];
+  int col_idx[2];
+  int missing_idx[2];
+
+  ArgVars() : Object() {
+    col_idx[0] = -1;
+    col_idx[1] = -1;
+    missing_idx[0] = -1;
+    missing_idx[1] = -1;
+  }
 
   virtual bool equals(Object *other) {
     ArgVars *casted_other = dynamic_cast<ArgVars *>(other);
@@ -216,6 +223,35 @@ int main(int argc, char **argv) {
   for (size_t idx = 0; idx < row_str_list->size(); idx += 1) {
     field_rows[idx] = row_to_fields(row_str_list->get(idx));
   }
+
+  Column** columns = infer_schema(largest_row_fields);
+  size_t num_rows = row_str_list->size();
+  size_t num_columns = largest_row_fields->size();
+
+  StrList* current_row;
+  for(size_t i = 0; i < num_columns; i++) {
+    for(size_t j = 0; j < num_rows; j++) {
+        current_row = field_rows[j];
+        if(current_row->size() <= i) {
+          columns[i]->push_back(new String(""));
+        } else {
+          columns[i]->push_back(field_rows[j]->get(i));
+        }
+    }
+  }
+
+  if(arg_vars->col_type >= 0) {
+    print_data_type(columns[arg_vars->col_type]->get_column_type());
+  }
+
+  printf("%d\n", arg_vars->missing_idx[0]);
+  // if (arg_vars->missing_idx[0] > -1 && arg_vars->missing_idx[1] > -1) {
+  //   int column_idx = arg_vars->missing_idx[0];
+  //   int row_idx = arg_vars->missing_idx[1];
+  //   printf("%d\n", columns[column_idx]->get(row_idx)->is_empty());
+  // }
+
+
 
   // TODO Given a field, return the type of the field as an enum
 
