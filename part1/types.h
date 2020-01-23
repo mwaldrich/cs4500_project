@@ -2,10 +2,14 @@
 #include <regex.h>
 #include <stdio.h>
 
-enum class DataType {BOOL, INT, FLOAT, STRING};
+/* Enum class representing supported column types */
+enum class DataType { BOOL, INT, FLOAT, STRING };
 
-DataType get_type(String *string) {
-  const char *field = string->str_;
+DataType get_type(String *sor_value) {
+  /* Given a field value from a SOR file, returns the corresponding DataType of that value.
+   * @param sor_value:
+   * @return: DataType corresponding to given SOR value */
+  const char *field_value = sor_value->str_;
   regex_t string_regex;
   regex_t float_regex;
   regex_t bool_regex;
@@ -16,22 +20,23 @@ DataType get_type(String *string) {
   int bool_regex_compiled = regcomp(&bool_regex, "^[0|1]$", REG_EXTENDED);
   int int_regex_compiled = regcomp(&int_regex, "[-+]?[0-9]+", REG_EXTENDED);
 
+  // check regex compilation
   assert(string_regex_compiled == 0);
   assert(float_regex_compiled == 0);
   assert(bool_regex_compiled == 0);
   assert(int_regex_compiled == 0);
 
   DataType field_type;
-  if (regexec(&string_regex, field, 0, nullptr, 0) == 0) {
+  if (regexec(&string_regex, field_value, 0, nullptr, 0) == 0) {
     field_type = DataType::STRING;
   }
-  else if (regexec(&float_regex, field, 0, nullptr, 0) == 0) {
-    field_type = DataType ::FLOAT;
+  else if (regexec(&float_regex, field_value, 0, nullptr, 0) == 0) {
+    field_type = DataType::FLOAT;
   }
-  else if (regexec(&bool_regex, field, 0, nullptr, 0) == 0) {
-    field_type = DataType ::BOOL;
+  else if (regexec(&bool_regex, field_value, 0, nullptr, 0) == 0) {
+    field_type = DataType::BOOL;
   }
-  else if (regexec(&int_regex, field, 0, nullptr, 0) == 0) {
+  else if (regexec(&int_regex, field_value, 0, nullptr, 0) == 0) {
     field_type = DataType::INT;
   }
   else {
@@ -48,11 +53,21 @@ DataType get_type(String *string) {
 };
 
 void print_data_type(DataType data_type) {
-  switch(data_type)
-  {
-      case DataType::BOOL  : puts("BOOL");   break;
-      case DataType::INT  : puts("INT");   break;
-      case DataType::FLOAT  : puts("FLOAT");   break;
-      case DataType::STRING  : puts("STRING");   break;
+  /* Prints out the given DataType
+   * @param data_type: DataType to print
+   * @return: None */
+  switch (data_type) {
+    case DataType::BOOL  :
+      puts("BOOL");
+      break;
+    case DataType::INT  :
+      puts("INT");
+      break;
+    case DataType::FLOAT  :
+      puts("FLOAT");
+      break;
+    case DataType::STRING  :
+      puts("STRING");
+      break;
   }
 }

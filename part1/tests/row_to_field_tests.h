@@ -2,6 +2,8 @@
 #include "../str.h"
 #include "../row_to_fields.h"
 
+/* Module testing our SOR row to fields parser */
+
 void single_fields() {
   String* row;
   String* output;

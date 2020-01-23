@@ -10,6 +10,13 @@ void test_split_no_skip() {
   char buffer[100];
   StrList* str_list;
 
+  // empty word
+  String* word0 = new String();
+  strcpy(buffer, word0->str_);
+  str_list = buffer_to_string_rows(buffer, false);
+  assert(str_list->size() == 0);
+  delete str_list;
+
   // single word
   String* word = new String("foobar");
   strcpy(buffer, word->str_);
@@ -52,6 +59,13 @@ void test_split_no_skip() {
 void test_split_skip() {
   char buffer[100];
   StrList* str_list;
+
+  // empty word
+  String* word0 = new String();
+  strcpy(buffer, word0->str_);
+  str_list = buffer_to_string_rows(buffer, true);
+  assert(str_list->size() == 0);
+  delete str_list;
 
   // single word
   String* word = new String("barfoo");
