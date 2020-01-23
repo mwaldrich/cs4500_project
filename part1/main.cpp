@@ -103,10 +103,12 @@ ArgVars *parse_cl_args(int argc, char **argv) {
    * arguments */
   ArgVars *arg_vars = new ArgVars();
   int opt;
+  bool file_read = false;
   while ((opt = getopt_long_only(argc, argv, "f:r:l:t:i:m:", arg_options, nullptr)) != -1) {
     switch (opt) {
       case 'f':
         arg_vars->file_name = optarg;
+        file_read = true;
         break;
       case 'r':
         arg_vars->from = char_array_to_uint(optarg);
@@ -147,7 +149,7 @@ ArgVars *parse_cl_args(int argc, char **argv) {
         exit(1);
     }
   }
-  if (arg_vars->file_name == nullptr) {
+  if (!file_read) {
     printf("must be given a file to read after -f flag");
     exit(1);
   }
@@ -232,7 +234,11 @@ Column **infer_schema(StrList *row_fields) {
    * @param row_fields: row of a SOR file, as a StrList where each String is SOR field value
    * @return: array of N Columns where each column was assigned a type from associated SOR field value */
   Column **columns = new Column *[row_fields->size()];
-  for (int i = 0; i < row_fields->size(); i++) columns[i] = new Column(get_type(row_fields->get(i)));
+  for (int i = 0; i < row_fields->size(); i++) {
+    puts(row_fields->get(i)->str_);
+    print_data_type(get_type(row_fields->get(i)));
+    columns[i] = new Column(get_type(row_fields->get(i)));
+  }
   return columns;
 }
 
