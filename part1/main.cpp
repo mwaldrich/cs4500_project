@@ -33,7 +33,7 @@ class ArgVars : public Object {
   char *file_name;
   size_t from = DEFAULT_FROM;
   size_t len = DEFAULT_LEN;
-  size_t col_type = -1;
+  int col_type = -1;
   int col_idx[2];
   int missing_idx[2];
 
@@ -244,14 +244,17 @@ int main(int argc, char **argv) {
     print_data_type(columns[arg_vars->col_type]->get_column_type());
   }
 
-  printf("%d\n", arg_vars->missing_idx[0]);
-  // if (arg_vars->missing_idx[0] > -1 && arg_vars->missing_idx[1] > -1) {
-  //   int column_idx = arg_vars->missing_idx[0];
-  //   int row_idx = arg_vars->missing_idx[1];
-  //   printf("%d\n", columns[column_idx]->get(row_idx)->is_empty());
-  // }
+   if (arg_vars->missing_idx[0] > -1 && arg_vars->missing_idx[1] > -1) {
+     int column_idx = arg_vars->missing_idx[0];
+     int row_idx = arg_vars->missing_idx[1];
+     printf("%d\n", columns[column_idx]->get(row_idx)->is_empty());
+   }
 
-
+  if (arg_vars->col_idx[0] > -1 && arg_vars->col_idx[1] > -1) {
+    int column_idx = arg_vars->col_idx[0];
+    int row_idx = arg_vars->col_idx[1];
+    columns[column_idx]->get(row_idx)->print();
+  }
 
   // TODO Given a field, return the type of the field as an enum
 
