@@ -5,6 +5,7 @@
 #include "object.h"
 #include <cstring>
 #include <cmath>
+#include "types.h"
 
 class StrList : public Object {
 /* Class representing a list of Strings, uses a array to provide the
@@ -398,13 +399,13 @@ class SortedStrList : public StrList {
 
 class Column : public StrList {
     public:
-    enum data_type {BOOL, INT, FLOAT, STRING} data_type_;
+    DataType data_type_;
     
-    Column(data_type data_type) : StrList() {
+    Column(DataType data_type) : StrList() {
         data_type_ = data_type;
     };
 
-    data_type colum_type() {
+    DataType get_column_type() {
         return data_type_;
-    }
+    };
 };
