@@ -6,6 +6,14 @@
 #include "buffer_reader.h"
 #include "row_to_fields.h"
 
+Column** infer_schema(StrList* row_fields) {
+  Column** columns = new Column*[row_fields->size()];
+  for(int i = 0; i < row_fields->size(); i++) {
+    columns[i] = new Column(get_type(row_fields->get(i)));
+  }
+  return columns;
+}
+
 #define DEFAULT_FROM 0
 #define DEFAULT_LEN 100
 #define READ_SCHEMA_LINE_COUNT 500
