@@ -41,13 +41,6 @@ class StrList : public Object {
     up_size();
   };
 
-//  StrList(String *start) : Object() {
-//    length_ = 1;
-//    list_ = this->create_null_array_(length_);
-//    list_[0] = start;
-//    up_size();
-//  };
-
   ~StrList() {
     /* Deletes this list by deleting the underlying array */
     delete[] list_;
