@@ -1,4 +1,4 @@
-#include "list.h"
+#include "../list.h"
 
 void str_lst_init_tests() {
   // empty
@@ -297,10 +297,20 @@ void str_lst_push_back_tests() {
   assert(c->length() == 3);
   assert(c->exists_at(2, d));
 
+  // set past initial length of list
+  StrList* e = new StrList(10);
+  assert(e->is_empty());
+  assert(e->length() == 10);
+  e->set(15, d);
+  assert(e->size() == 1);
+  assert(e->length() > 10);
+  assert(e->exists_at(15, d));
+
   delete a;
   delete b;
   delete c;
   delete d;
+  delete e;
 
   puts("string list push back tests passed");
 };
@@ -397,7 +407,7 @@ void str_lst_remove_tests() {
 };
 
 
-int main() {
+int str_list_tests() {
   str_lst_init_tests();
   str_lst_equality_tests();
   str_lst_hash_tests();

@@ -1,4 +1,4 @@
-#include "str.h"
+#include "../str.h"
 
 void str_init_tests() {
   // empty init
@@ -221,7 +221,7 @@ void str_clone_tests() {
   puts("string clone tests passed");
 };
 
-int main() {
+int str_tests() {
   str_init_tests();
   str_equality_tests();
   str_hash_tests();
