@@ -1,8 +1,33 @@
-//
-// Created by natejh on 1/23/20.
-//
+// lang::CwC
+#pragma once
+#include <cstring>
+#include <cassert>
+#include "object.h"
+#include "helper.h"
 
-#ifndef SD_PART_1_PART2_STR_H_
-#define SD_PART_1_PART2_STR_H_
+class String : public Object {
 
-#endif //SD_PART_1_PART2_STR_H_
+  size_t size();
+
+  size_t hash();
+
+  char get(int idx);
+
+  String *get_slice(size_t start, size_t end);
+
+  char get(size_t idx);
+
+  String *reverse();
+
+  int compare(String *str);
+
+  virtual bool equals(Object *other);
+
+  bool is_empty();
+
+  String *concat(String *other);
+
+  String *clone();
+
+  virtual void print();
+};

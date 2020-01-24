@@ -1,32 +1,22 @@
-#pragma once                                                                     
+#pragma once
 //lang::CwC                                                                                                                                                       
-/**                                                                              
- * A class that represents the top of the object hierarchy.                      
- * author: vitekj@me.com */                                                      
-class Object : public Sys {                                                      
- public:                                                                         
-  size_t hash_;  // cache the hash value                                         
-                                                                                 
-  /** Default constructor ensure that hash is initialized */                     
-  Object();                                                       
-                                                                                 
-  /** Default constructor is virtual to support subclasses */                    
-  virtual ~Object();                                                           
-                                                                                 
-  /** Returns the object's hash value. Two objects that are equal should         
-   * have the same hash; object's that are not, may have the same hash.          
-   * Subclasses should implement hash_me_(). */                                  
-  virtual size_t hash();
-                                                                                 
-  /** Trivial hash function. */                                                  
-  virtual size_t hash_me_();                                      
-                                                                                 
-  /** Use the address of the other object to determine equality. */              
-  virtual bool equals(Object* other);                  
-                                                                                 
-  /** Return a newly allocated string describin the object */                    
-  virtual char* to_string();                      
-                                                                                 
-  /** Print to stdout. */                                                        
-  virtual void print();                                                                                                                   
+
+/* A class that representing the top of a object hierarchy */
+class Object {
+
+  /* Returns this object's hash value. Two objects that are equal should have the same hash; object's that are not
+   * may or may not have the same hash. */
+  virtual unsigned int hash();
+
+  /* Trivial hash function. */
+  virtual unsigned int hash_me_();
+
+  /* Returns if other Object is the same as this Object */
+  virtual bool equals(Object *other);
+
+  /* Returns a C style string describing this Object */
+  virtual char *to_string();
+
+  /* Prints a representation of this object to stdout */
+  virtual void print();
 };   
