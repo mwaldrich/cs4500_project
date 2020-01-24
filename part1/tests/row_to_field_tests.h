@@ -159,6 +159,26 @@ void single_fields() {
   delete output;
   delete fields;
 
+  // back bracket in quotes
+  row = new String("<\">\">");
+  output = new String("\">\"");
+  fields = row_to_fields(row);
+  assert(fields->size() == 1);
+  assert(fields->get(0)->equals(output));
+  delete row;
+  delete output;
+  delete fields;
+
+  // start bracket after start bracket
+  row = new String("<<<<<>");
+  output = new String("<<<<");
+  fields = row_to_fields(row);
+  assert(fields->size() == 1);
+  assert(fields->get(0)->equals(output));
+  delete row;
+  delete output;
+  delete fields;
+
   puts("single field tests passed");
 }
 
@@ -271,7 +291,7 @@ void multiple_fields() {
   delete fields;
 
   // two items with spaces within both
-  row = new String("<foo ><  bar  >");
+  row = new String("<foo >< bar  >");
   output = new String("foo");
   output1 = new String("bar");
   fields = row_to_fields(row);
@@ -291,6 +311,24 @@ void multiple_fields() {
   assert(fields->size() == 2);
   assert(fields->get(0)->equals(output));
   assert(fields->get(1)->equals(output1));
+  delete row;
+  delete output;
+  delete output1;
+  delete fields;
+
+  row = new String("  <  foo >  <  bar  >   < gah > <kool><tre>");
+  output = new String("foo");
+  output1 = new String("bar");
+  String* output2 = new String("gah");
+  String* output3 = new String("kool");
+  String* output4 = new String("tre");
+  fields = row_to_fields(row);
+  assert(fields->size() == 5);
+  assert(fields->get(0)->equals(output));
+  assert(fields->get(1)->equals(output1));
+  assert(fields->get(2)->equals(output2));
+  assert(fields->get(3)->equals(output3));
+  assert(fields->get(4)->equals(output4));
   delete row;
   delete output;
   delete output1;

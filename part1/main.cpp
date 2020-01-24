@@ -235,8 +235,6 @@ Column **infer_schema(StrList *row_fields) {
    * @return: array of N Columns where each column was assigned a type from associated SOR field value */
   Column **columns = new Column *[row_fields->size()];
   for (int i = 0; i < row_fields->size(); i++) {
-    puts(row_fields->get(i)->str_);
-    print_data_type(get_type(row_fields->get(i)));
     columns[i] = new Column(get_type(row_fields->get(i)));
   }
   return columns;

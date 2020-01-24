@@ -1,4 +1,4 @@
-#include "list.h"
+#include "../list.h"
 
 void sorted_str_lst_sorted_add_lst() {
   SortedStrList* a = new SortedStrList(2);
@@ -39,7 +39,7 @@ void sorted_str_lst_sorted_add_lst() {
   puts("sorted string list sorted add tests passed");
 };
 
-int main() {
+int sorted_str_list_tests() {
   sorted_str_lst_sorted_add_lst();
   puts("sorted list tests passed");
 };

@@ -15,20 +15,16 @@ StrList *row_to_fields(String *row_string) {
   bool in_quotes = false;
   for (size_t idx = 0; idx < row_string->size(); idx++) {
     char cur_char = row_string->get(idx);
-
     if (cur_char == '<' && start_bracket_idx < 0) {
       start_bracket_idx = idx;
     }
-    else if (start_bracket_idx > -1  && ((cur_char == '>') ||
+    else if (start_bracket_idx > -1  && ((cur_char == '>' && !in_quotes) ||
         (in_quotes && cur_char == '"') ||
         (value_found && cur_char == ' ' && !in_quotes))) {
       size_t end_idx = in_quotes ? idx + 1 : idx;
       String *slice = row_string->get_slice(start_bracket_idx + 1, end_idx);
-      printf("%s\n", slice->str_);
-      printf("%d\n", field_idx);
       fields->push_back(slice);
       //fields->set(field_idx, slice);
-      printf("%d\n", fields->size());
       field_idx += 1;
       start_bracket_idx = -1;
       value_found = false;
@@ -45,10 +41,9 @@ StrList *row_to_fields(String *row_string) {
       in_quotes = true;
       value_found = true;
     }
-    else if (cur_char != ' ') {
+    else if (cur_char != ' ' && cur_char != '>') {
       value_found = true;
     }
   }
-  printf("%d\n", fields->size());
   return fields;
 }
