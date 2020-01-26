@@ -3,9 +3,9 @@
 #include <cstring>
 #include <cassert>
 #include "object.h"
-#include "helper.h"
 
-class String : public Object {
+class String : public Object
+{
 
   size_t size();
 

@@ -1,15 +1,16 @@
 #pragma once
-//lang::CwC                                                                                                                                                       
+//lang::CwC
 
 /* A class that representing the top of a object hierarchy */
-class Object {
+class Object
+{
 
   /* Returns this object's hash value. Two objects that are equal should have the same hash; object's that are not
    * may or may not have the same hash. */
-  virtual unsigned int hash();
+  virtual size_t hash();
 
   /* Trivial hash function. */
-  virtual unsigned int hash_me_();
+  virtual size_t hash_me_();
 
   /* Returns if other Object is the same as this Object */
   virtual bool equals(Object *other);
@@ -19,4 +20,4 @@ class Object {
 
   /* Prints a representation of this object to stdout */
   virtual void print();
-};   
+};
