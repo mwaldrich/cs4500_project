@@ -1,5 +1,4 @@
 #include "object.h"
-#include "str.h"
 
 /* A queue of Objects, supporting O(1) insertion at the start of the queue and O(1) retrieval / removal from the end
  * of the queue. */

@@ -1,3 +1,4 @@
+#include "string.h"
 #include "queue.h"
 
 void string_queue_normal_usage() {
