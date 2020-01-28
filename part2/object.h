@@ -4,6 +4,12 @@
 /* A class that representing the top of a object hierarchy */
 class Object
 {
+  
+  // Empty object constructor
+  Object();
+  
+  // Virtual object destructor; able to be overriden by subclasses
+  virtual ~Object();
 
   /* Returns this object's hash value. Two objects that are equal should have the same hash; object's that are not
    * may or may not have the same hash. */
