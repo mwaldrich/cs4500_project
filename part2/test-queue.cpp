@@ -1,3 +1,5 @@
+#include <assert.h>
+#include "str.h"
 #include "queue.h"
 
 void string_queue_normal_usage() {
