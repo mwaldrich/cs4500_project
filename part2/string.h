@@ -7,6 +7,10 @@
 class String : public Object
 {
 
+  String();
+  
+  virtual ~String();
+
   size_t size();
 
   size_t hash();

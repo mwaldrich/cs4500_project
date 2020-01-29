@@ -5,6 +5,12 @@
 class Queue : public Object
 {
 
+  // construct a new empty queue
+  Queue();
+  
+  // virtual queue destructor; can be overriden by subclasses
+  virtual ~Queue();
+
   /* Adds the given Object to the start of this Queue */
   void add(Object *o);
 
