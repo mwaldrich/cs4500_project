@@ -32,6 +32,8 @@ void string_queue_normal_usage() {
   assert(string_queue->size() == 0);
 
   delete string_queue;
+  delete item;
+  delete item2;
 }
 
 void string_queue_advanced_usage() {
@@ -97,9 +99,10 @@ void string_queue_advanced_usage() {
   delete string_queue;
   delete another_string_queue;
   delete string1;
-  // delete popped;
   delete string2;
   delete string3;
+  // shouldn't delete `popped`, since it is aliased to string3.
+  // if we tried to free it here, it would cause a double free bug
 }
 
 void string_queue_hashing_and_equality() {
@@ -138,6 +141,12 @@ void string_queue_hashing_and_equality() {
   another_string_queue->clear();
   assert(string_queue->equals(another_string_queue));
   assert(string_queue->hash() == another_string_queue->hash());
+
+  delete string_queue;
+  delete another_string_queue;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 void object_queue_normal_usage() {
@@ -282,6 +291,9 @@ void object_queue_hashing_and_equality() {
 
   delete object_queue;
   delete another_object_queue;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 int main() {
