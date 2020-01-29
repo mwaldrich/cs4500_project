@@ -1,5 +1,6 @@
 #include "string.h"
 #include "queue.h"
+#include "cassert"
 
 void string_queue_normal_usage() {
   /* Tests the normal usage of a StringQueue - adding, removing, peeking, and checking the size of the queue */
@@ -160,7 +161,7 @@ void object_queue_normal_usage() {
   assert(object_queue->peek()->equals(item));
 
   // remove an item
-  String* popped = object_queue->remove();
+  Object* popped = object_queue->remove();
   assert(popped->equals(item));
   assert(object_queue->size() == 1);
   assert(object_queue->peek()->equals(item2));
@@ -219,7 +220,7 @@ void object_queue_advanced_usage() {
   // add non-empty self to self
   another_object_queue->add_all(another_object_queue);
   assert(another_object_queue->size() == 6);
-  String* popped = another_object_queue->remove();
+  Object* popped = another_object_queue->remove();
   assert(popped->equals(string1));
   popped = another_object_queue->remove();
   assert(popped->equals(string2));
