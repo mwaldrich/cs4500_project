@@ -1,5 +1,5 @@
 #include "queue.h"
-#include "string.h"
+#include "str.h"
 
 void string_queue_normal_usage() {
   /* Tests the normal usage of a Queue - adding, removing, peeking, and checking the size of the queue */
@@ -296,6 +296,163 @@ void object_queue_hashing_and_equality() {
   delete string3;
 }
 
+void object_queue_big_usage() {
+    /* Tests the normal usage of a Queue - adding, removing, peeking, and checking the size of the queue */
+    Queue *object_queue = new Queue();
+    String *item = new String("foobar");
+    String *item2 = new String("tube");
+    String *item3 = new String("cube");
+
+    // empty queue size
+    assert(object_queue->size() == 0);
+
+    // add one item
+    object_queue->add(item);
+    assert(object_queue->size() == 1);
+    assert(object_queue->peek()->equals(item));
+
+    // add another item
+    object_queue->add(item2);
+    assert(object_queue->size() == 2);
+    assert(object_queue->peek()->equals(item));
+
+    // remove an item
+    String *popped = static_cast<String *>(object_queue->remove());
+    assert(popped->equals(item));
+    assert(object_queue->size() == 1);
+    assert(object_queue->peek()->equals(item2));
+
+    // remove another item
+    popped = static_cast<String *>(object_queue->remove());
+    assert(popped->equals(item2));
+    assert(object_queue->size() == 0);
+
+    // queue should now be empty
+
+    // add 10000 items
+    for (int i = 0; i < 10000; i++) {
+        // which item to add
+        int itemIndex = i % 3;
+
+        // add one of item, item2, or item3
+        switch (itemIndex) {
+            case 0:
+                object_queue->add(item);
+                break;
+            case 1:
+                object_queue->add(item2);
+                break;
+            case 2:
+                object_queue->add(item3);
+                break;
+        }
+    }
+
+    // ensure length is 10000
+    assert(object_queue->size() == 10000);
+
+    // dequeue 2512 items
+    for (int i = 0; i < 2512; i++) {
+        object_queue->remove();
+    }
+
+    // ensure length is 10000 - 2512 = 7488
+    assert(object_queue->size() == 7488);
+
+    // dequeue 7481 items
+    for (int i = 0; i < 7481; i++) {
+        object_queue->remove();
+    }
+
+    // ensure length is 7488 - 7481 = 7
+    assert(object_queue->size() == 7);
+
+    // make sure next value in queue is (10000-7) % 3 = 0 --> item
+    assert(object_queue->peek()->equals(item));
+
+    // enqueue 1234 items
+    for (int i = 0; i < 1234; i++) {
+        object_queue->add(item2);
+    }
+
+    // ensure length is 7 + 1234 = 1241
+    assert(object_queue->size() == 1241);
+
+    // make new queue
+    Queue *object_queue2 = new Queue();
+
+    // add all elements from object_queue to object_queue2
+    object_queue2->add_all(object_queue);
+
+    // ensure they are equal
+    assert(object_queue->size() == object_queue2->size());
+    assert(object_queue->hash() == object_queue2->hash());
+    assert(object_queue2->equals(object_queue));
+    assert(object_queue->equals(object_queue2));
+
+    // remove all elements 1241 elements from object_queue
+    for (int i = 0; i < 1241; i++) {
+        object_queue->remove();
+    }
+
+    // ensure object_queue is empty
+    assert(object_queue->size() == 0);
+
+    // ensure empty object_queue is equals() to a new empty queue
+    Queue *object_queue3 = new Queue();
+    assert(object_queue->size() == object_queue3->size());
+    assert(object_queue->hash() == object_queue3->hash());
+    assert(object_queue->equals(object_queue3));
+    assert(object_queue3->equals(object_queue));
+
+    // ensure object_queue (empty) is not equal to object_queue_2 (with 1241 elements)
+    // ensure object_queue3 (empty) is not equal to object_queue_2 (with 1241 elements)
+    assert(object_queue->size() != object_queue2->size());
+    assert(!object_queue->equals(object_queue2));
+    assert(!object_queue2->equals(object_queue));
+
+    assert(object_queue3->size() != object_queue2->size());
+    assert(!object_queue3->equals(object_queue2));
+    assert(!object_queue2->equals(object_queue3));
+
+    // add all remaining 1241 elements from object_queue2 into object_queue3
+    for (int i = 0; i < 1241; i++) {
+        object_queue3->add(object_queue2->remove());
+    }
+
+    // ensure object_queue2 is empty, and object_queue3 has 1241 items
+    assert(object_queue2->size() == 0);
+    assert(object_queue2->equals(object_queue));
+    assert(object_queue->equals(object_queue2));
+
+    assert(object_queue3->size() == 1241);
+
+    // remove remaining 1241 items from object_queue3
+    for (int i = 0; i < 1241; i++) {
+        object_queue3->remove();
+    }
+
+    // ensure object_queue3 is emmpty
+    assert(object_queue3->size() == 0);
+
+    // ensure object_queue, object_queue2, and object_queue3 are all equal and empty.
+    assert(object_queue->equals(object_queue2));
+    assert(object_queue2->equals(object_queue3));
+    assert(object_queue->equals(object_queue3));
+    assert(object_queue->size() == 0);
+    assert(object_queue2->size() == 0);
+    assert(object_queue3->size() == 0);
+    assert(object_queue->hash() == object_queue2->hash());
+    assert(object_queue2->hash() == object_queue3->hash());
+
+    delete object_queue;
+    delete object_queue2;
+    delete object_queue3;
+    delete item;
+    delete item2;
+    delete item3;
+}
+
 int main() {
   string_queue_normal_usage();
   string_queue_advanced_usage();
@@ -303,4 +460,5 @@ int main() {
   object_queue_normal_usage();
   object_queue_advanced_usage();
   object_queue_hashing_and_equality();
+  object_queue_big_usage();
 }
