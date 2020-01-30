@@ -1,5 +1,5 @@
 #include "queue.h"
-#include "str.h"
+#include "string.h"
 
 void string_queue_normal_usage() {
   /* Tests the normal usage of a Queue - adding, removing, peeking, and checking the size of the queue */
